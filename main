@@ -1,0 +1,70 @@
+import keyboard
+from kivy.app import App
+from kivy.clock import Clock
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.image import Image
+
+time = 0
+elixir = 7
+gameover = False
+
+
+def timer(dt):
+    global time
+    time += 1
+    print("Time:", time)
+
+
+def elixiradd(dt):
+    global time, elixir
+    elixir += 1
+    if time >= 120:
+        elixir += 1
+    if elixir > 10:
+        elixir = 10
+
+
+def display(dt, elixir_widgets):
+    global elixir
+    if not gameover:
+        for i, elixir_widget in enumerate(elixir_widgets):
+            if i < elixir:
+                elixir_widget.source = f"image_{i + 1}.png"  
+            else:
+                elixir_widget.source = ""
+
+
+class MyKeyboardListener(App):
+    def build(self):
+        elixir_layout = BoxLayout(orientation='horizontal')
+        elixir_widgets = []
+
+        for i in range(10):
+            elixir_image = Image(source="")
+            elixir_layout.add_widget(elixir_image)
+            elixir_widgets.append(elixir_image)
+
+        Clock.schedule_interval(timer, 1)
+        Clock.schedule_interval(elixiradd, 2.5)  
+        Clock.schedule_interval(lambda dt: display(dt, elixir_widgets), 0.5)
+
+        keyboard.on_press_key('0', self.game_over)
+        for i in range(10):
+            keyboard.on_press_key(str(i), self.decrease_elixir)
+
+        return elixir_layout
+
+    def game_over(self, key):
+        global gameover
+        gameover = True
+
+    def decrease_elixir(self, key):
+        global elixir
+        amount = int(key.name)
+        elixir -= amount
+        print("Elixir Decreased. Current Elixir:", elixir)
+
+
+if __name__ == "__main__":
+    MyKeyboardListener().run()
+
