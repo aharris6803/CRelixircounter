@@ -20,6 +20,8 @@ def elixiradd(dt):
     elixir += 1
     if time >= 120:
         elixir += 1
+    if time >= 240:
+        elixir += 1
     if elixir > 10:
         elixir = 10
 
@@ -45,7 +47,7 @@ class MyKeyboardListener(App):
             elixir_widgets.append(elixir_image)
 
         Clock.schedule_interval(timer, 1)
-        Clock.schedule_interval(elixiradd, 2.5)  
+        Clock.schedule_interval(elixiradd, 2.8)  
         Clock.schedule_interval(lambda dt: display(dt, elixir_widgets), 0.5)
 
         keyboard.on_press_key('0', self.game_over)
