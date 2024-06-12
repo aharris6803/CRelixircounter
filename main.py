@@ -1,4 +1,4 @@
-import keyboard
+from pynput import keyboard as pynput_keyboard
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
@@ -16,7 +16,7 @@ def timer(dt):
 
 def elixiradd(dt):
     global time, elixir
-    elixir += 1 + round(time/120, 1)
+    elixir += 1 + int(time/120)
     if elixir > 10:
         elixir = 10
 
@@ -24,7 +24,8 @@ def elixiradd(dt):
 def display(dt, elixir_widgets):
     global elixir
     if not gameover:
-        elixir_widget.source = f"image_{elixir}.png"  
+        for widget in elixir_widgets:
+            widget.source = f"image_{int(elixir)}.png"
 
 
 class MyKeyboardListener(App):
@@ -33,31 +34,39 @@ class MyKeyboardListener(App):
         elixir_widgets = []
 
         for i in range(10):
-            elixir_image = Image(source="")
+            elixir_image = Image(source="", size_hint=(None, None), size=(800, 170), allow_stretch=True)
             elixir_layout.add_widget(elixir_image)
             elixir_widgets.append(elixir_image)
 
         Clock.schedule_interval(timer, 1)
-        Clock.schedule_interval(elixiradd, 2.8)  
+        Clock.schedule_interval(elixiradd, 2.8)
         Clock.schedule_interval(lambda dt: display(dt, elixir_widgets), 0.5)
 
-        keyboard.on_press_key('0', self.game_over)
-        for i in range(10):
-            keyboard.on_press_key(str(i), self.decrease_elixir)
+        listener = pynput_keyboard.Listener(on_press=self.on_press)
+        listener.start()
 
         return elixir_layout
 
-    def game_over(self, key):
+    def on_press(self, key):
+        try:
+            if key.char == '0':
+                self.game_over()
+            elif key.char.isdigit():
+                self.decrease_elixir(int(key.char))
+        except AttributeError:
+            pass
+
+    def game_over(self):
         global gameover
         gameover = True
 
-    def decrease_elixir(self, key):
+    def decrease_elixir(self, amount):
         global elixir
-        amount = int(key.name)
         elixir -= amount
+        if elixir < 0:
+            elixir = 0
         print("Elixir Decreased. Current Elixir:", elixir)
 
 
 if __name__ == "__main__":
     MyKeyboardListener().run()
-
