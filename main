@@ -17,10 +17,6 @@ def timer(dt):
 def elixiradd(dt):
     global time, elixir
     elixir += 1 + round(time/120, 1)
-    if time >= 120:
-        elixir += 1
-    if time >= 240:
-        elixir += 1
     if elixir > 10:
         elixir = 10
 
@@ -28,11 +24,7 @@ def elixiradd(dt):
 def display(dt, elixir_widgets):
     global elixir
     if not gameover:
-        for i, elixir_widget in enumerate(elixir_widgets):
-            if i < elixir:
-                elixir_widget.source = f"image_{i + 1}.png"  
-            else:
-                elixir_widget.source = ""
+        elixir_widget.source = f"image_{elixir}.png"  
 
 
 class MyKeyboardListener(App):
